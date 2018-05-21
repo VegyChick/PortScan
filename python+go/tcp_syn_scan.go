@@ -53,7 +53,7 @@ type scanJob struct {
 var stopFlag = make(chan uint8, 1)
 
 //export Scan
-func Scan(remote_ *C.char, portRange_ *C.char, interfaceName_ *C.char) {
+func Scan(remote_ *C.char, portRange_ *C.char, interfaceName_ *C.char) *C.char {
     
     rate := time.Second / 400
     throttle := time.Tick(rate)
@@ -105,13 +105,19 @@ func Scan(remote_ *C.char, portRange_ *C.char, interfaceName_ *C.char) {
         jobs <- &scanJob{Stop: 1}
     }(1024)
 
+    var open_port_string string
+    open_port_string = ""
     for {
         select {
         case res := <-results:
             fmt.Println("扫描到开放的端口：",res.Port) //输出开放的端口号
+            port := fmt.Sprintf("%d", res.Port)
+            open_port_string = open_port_string + port + " "
         case <-stopFlag:
             e_time := time.Now().Unix()
             fmt.Println("本次扫描总共耗时(s):",e_time-s_time)
+            open_port_char := C.CString(open_port_string) 
+            return open_port_char
             os.Exit(0)
         }
     }
