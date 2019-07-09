@@ -35,9 +35,9 @@ if __name__=="__main__":
 
     s_time = time.time()
 
-    ip = "14.215.177.38"
+    ip = "172.27.0.11"
 
-    for port in range(0,1024):
+    for port in range(0,10000):
         ''' 此处可用协作 '''
         tcp_scan(ip,port)
         
